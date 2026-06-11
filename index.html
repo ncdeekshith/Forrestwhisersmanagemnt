@@ -848,7 +848,7 @@
     }
 
     function prettyTime(value) {
-      const date = value?.toDate ? value.toDate() : value ? new Date(value) : new Date();
+      const date = normalizeDate(value) || new Date();
       return new Intl.DateTimeFormat("en-IN", {
         day: "2-digit",
         month: "short",
@@ -857,11 +857,17 @@
       }).format(date);
     }
 
+    function normalizeDate(value) {
+      if (!value) return null;
+      if (value.toDate) return value.toDate();
+      if (typeof value.seconds === "number") return new Date(value.seconds * 1000);
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
     function sortTime(value) {
-      if (!value) return 0;
-      if (value.toMillis) return value.toMillis();
-      if (value.toDate) return value.toDate().getTime();
-      return new Date(value).getTime() || 0;
+      const date = normalizeDate(value);
+      return date ? date.getTime() : 0;
     }
 
     function showToast(message) {
@@ -1041,14 +1047,23 @@
     }
 
     function renderAll() {
-      renderResidents();
-      renderTasks();
-      renderStats();
-      renderAttendanceHistory();
-      renderFixedExpenses();
-      renderExpenseHistory();
-      renderExpenseForm();
-      renderSetup();
+      [
+        ["residents", renderResidents],
+        ["tasks", renderTasks],
+        ["stats", renderStats],
+        ["attendance history", renderAttendanceHistory],
+        ["fixed expenses", renderFixedExpenses],
+        ["expense history", renderExpenseHistory],
+        ["expense form", renderExpenseForm],
+        ["setup", renderSetup]
+      ].forEach(([label, render]) => {
+        try {
+          render();
+        } catch (error) {
+          console.error(`Could not render ${label}`, error);
+          showToast(`Could not render ${label}: ${error.message}`);
+        }
+      });
     }
 
     function selectResident(residentId) {
