@@ -1105,7 +1105,8 @@
         renderAll();
         showToast(`${task.title} marked ${status} by ${resident.name}.`);
       } catch (error) {
-        showToast(error.message === "already-marked" ? `${resident.name} already marked this duty today.` : "Could not save. Check Firestore is enabled and rules are in test mode.");
+        const detail = error.code || error.message || "unknown";
+        showToast(error.message === "already-marked" ? `${resident.name} already marked this duty today.` : `Could not save: ${detail}`);
       }
     }
 
@@ -1142,7 +1143,7 @@
         renderAll();
         showToast("Expense saved.");
       } catch (error) {
-        showToast(`Could not save expense: ${error.message}`);
+        showToast(`Could not save expense: ${error.code || error.message}`);
       }
     }
 
