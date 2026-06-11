@@ -6,10 +6,10 @@
   <title>Forrest Whipsers Tracker</title>
   <style>
     :root {
-      --ink: #17211d;
-      --muted: #69746f;
-      --line: #dce4df;
-      --paper: #f6f8f2;
+      --ink: #121816;
+      --muted: #66736d;
+      --line: #e1e7e3;
+      --paper: #f7faf7;
       --card: #ffffff;
       --green: #2f6d52;
       --green-2: #dfeee6;
@@ -20,7 +20,8 @@
       --gold: #d8a936;
       --gold-2: #fbf0c8;
       --red: #b7413c;
-      --shadow: 0 18px 42px rgba(24, 36, 30, .11);
+      --shadow: 0 18px 42px rgba(24, 36, 30, .09);
+      --soft-shadow: 0 8px 22px rgba(24, 36, 30, .08);
     }
 
     * { box-sizing: border-box; }
@@ -33,7 +34,8 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
       background:
-        linear-gradient(140deg, rgba(228, 239, 245, .9), rgba(246, 248, 242, .72) 42%, rgba(251, 240, 200, .72)),
+        radial-gradient(circle at top left, rgba(223, 238, 230, .92), transparent 38%),
+        linear-gradient(145deg, rgba(247, 250, 247, .98), rgba(228, 239, 245, .72) 52%, rgba(251, 240, 200, .48)),
         var(--paper);
     }
 
@@ -50,9 +52,9 @@
     }
 
     .shell {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1180px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 18px 0 44px;
+      padding: 14px 0 44px;
     }
 
     .hero {
@@ -60,7 +62,7 @@
       grid-template-columns: 1fr auto;
       gap: 18px;
       align-items: end;
-      padding: 18px 0;
+      padding: 14px 0 10px;
     }
 
     .eyebrow {
@@ -74,16 +76,16 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(34px, 6vw, 64px);
+      font-size: clamp(32px, 6vw, 60px);
       line-height: .96;
       letter-spacing: 0;
     }
 
     .hero p {
       max-width: 680px;
-      margin: 10px 0 0;
+      margin: 9px 0 0;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 17px;
       line-height: 1.5;
     }
 
@@ -93,7 +95,7 @@
       background: rgba(255, 255, 255, .86);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--soft-shadow);
     }
 
     .mini-label {
@@ -122,8 +124,8 @@
       z-index: 4;
       display: flex;
       gap: 8px;
-      padding: 10px 0;
-      background: rgba(246, 248, 242, .86);
+      padding: 10px 0 14px;
+      background: rgba(247, 250, 247, .84);
       backdrop-filter: blur(14px);
     }
 
@@ -145,7 +147,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 310px 1fr;
+      grid-template-columns: 420px 1fr;
       gap: 18px;
       align-items: start;
     }
@@ -157,7 +159,7 @@
       background: rgba(255, 255, 255, .92);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--soft-shadow);
     }
 
     .side {
@@ -190,6 +192,7 @@
       border: 1px solid transparent;
       border-radius: 8px;
       text-align: left;
+      box-shadow: none;
     }
 
     .resident.active {
@@ -311,16 +314,16 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
     .card {
-      min-height: 268px;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 16px;
+      gap: 12px;
+      padding: 14px;
     }
 
     .card-head {
@@ -331,8 +334,8 @@
     }
 
     .icon {
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       display: grid;
       place-items: center;
       border-radius: 8px;
@@ -348,7 +351,7 @@
     .form-box h2,
     .table-head h2 {
       margin: 0;
-      font-size: 19px;
+      font-size: 18px;
       letter-spacing: 0;
     }
 
@@ -381,7 +384,7 @@
     }
 
     .result {
-      min-height: 78px;
+      min-height: 0;
       padding: 12px;
       background: #f7f9f5;
       border: 1px solid var(--line);
@@ -421,7 +424,39 @@
     .btn.soft { color: var(--green); background: var(--green-2); border: 1px solid #c8dfd2; }
     .btn.danger { color: #fff; background: var(--red); }
     .btn.clay { color: #fff; background: var(--clay); }
+    .btn.blue { color: #fff; background: var(--blue); }
     .btn.grow { flex: 1 1 140px; }
+
+    .quick-attendance {
+      display: grid;
+      gap: 10px;
+    }
+
+    .overview-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .overview-card {
+      padding: 16px;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .overview-card strong {
+      display: block;
+      margin-top: 7px;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .overview-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
 
     .expense-grid {
       display: grid;
@@ -545,18 +580,27 @@
       }
 
       .cards,
-      .expense-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .expense-grid,
+      .overview-strip {
+        grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 680px) {
       .shell {
-        width: min(100% - 20px, 1180px);
+        width: min(100% - 18px, 1180px);
         padding-top: 8px;
       }
 
-      h1 { font-size: 38px; }
+      .hero {
+        gap: 12px;
+      }
+
+      h1 { font-size: 36px; }
+
+      .hero p {
+        font-size: 15px;
+      }
 
       .nav {
         overflow-x: auto;
@@ -578,6 +622,15 @@
         grid-template-columns: 1fr;
       }
 
+      .side,
+      .card,
+      .form-box,
+      .table-box,
+      .overview-card,
+      .money-card {
+        box-shadow: 0 8px 20px rgba(24, 36, 30, .08);
+      }
+
       .table-box {
         overflow-x: auto;
       }
@@ -592,9 +645,9 @@
   <main class="shell">
     <header class="hero">
       <section>
-        <p class="eyebrow">A 3BHK villa home board</p>
+        <p class="eyebrow">Home board</p>
         <h1>Forrest Whipsers Tracker</h1>
-        <p>Track Ratnamma's attendance, shared home expenses, and monthly splits for Deekshith, Varun, and Rexa.</p>
+        <p>Track your home expense all in one place.</p>
       </section>
       <section class="clock-card" aria-live="polite">
         <div class="mini-label">Live date and time</div>
@@ -614,6 +667,11 @@
         <section>
           <h2 class="section-title">Marking as</h2>
           <div class="resident-grid" id="residentGrid"></div>
+        </section>
+
+        <section class="quick-attendance">
+          <h2 class="section-title">Ratnamma today</h2>
+          <div class="cards" id="taskCards"></div>
         </section>
 
         <section>
@@ -637,7 +695,23 @@
 
       <section class="main">
         <section class="panel-view active" id="attendanceView">
-          <div class="cards" id="taskCards"></div>
+          <div class="overview-strip">
+            <article class="overview-card">
+              <div class="mini-label">Today</div>
+              <strong id="todayMarked">0/0</strong>
+              <span>Attendance entries marked</span>
+            </article>
+            <article class="overview-card">
+              <div class="mini-label">Ratnamma</div>
+              <strong id="todayPresent">0</strong>
+              <span>Present marks today</span>
+            </article>
+            <article class="overview-card">
+              <div class="mini-label">Live sync</div>
+              <strong id="liveSyncChip">...</strong>
+              <span>Firebase status</span>
+            </article>
+          </div>
           <section class="table-box">
             <div class="table-head">
               <h2>Attendance history</h2>
@@ -713,6 +787,23 @@
               </div>
             </div>
           </section>
+          <section class="form-box">
+            <h2>Email reminders</h2>
+            <p class="notice">
+              Use the included Apps Script to send daily 8:00 AM Gmail reminders from ncdeekshith@gmail.com and to send split reminders on demand.
+            </p>
+            <div class="form-grid">
+              <label class="wide">
+                Email Apps Script Web App URL
+                <input id="mailerUrl" placeholder="https://script.google.com/macros/s/.../exec">
+              </label>
+              <div class="actions">
+                <button class="btn primary" type="button" id="saveMailer">Save mail setup</button>
+                <button class="btn blue" type="button" id="sendAttendanceMail">Send attendance reminder</button>
+                <button class="btn clay" type="button" id="sendSplitMail">Send split reminder</button>
+              </div>
+            </div>
+          </section>
         </section>
       </section>
     </section>
@@ -767,6 +858,7 @@
       selectedResident: loadSelectedResident(),
       attendance: loadLocal("fw-attendance", {}),
       expenses: loadLocal("fw-expenses", []),
+      mailer: loadLocal("fw-mailer", {}),
       activeView: "attendance",
       firebaseReady: false,
       firebaseError: "",
@@ -785,6 +877,9 @@
       absentCount: document.querySelector("#absentCount"),
       markedCount: document.querySelector("#markedCount"),
       rateCount: document.querySelector("#rateCount"),
+      todayMarked: document.querySelector("#todayMarked"),
+      todayPresent: document.querySelector("#todayPresent"),
+      liveSyncChip: document.querySelector("#liveSyncChip"),
       monthlyTotal: document.querySelector("#monthlyTotal"),
       perHead: document.querySelector("#perHead"),
       expensePayer: document.querySelector("#expensePayer"),
@@ -793,6 +888,7 @@
       expenseDate: document.querySelector("#expenseDate"),
       expenseNote: document.querySelector("#expenseNote"),
       syncStatus: document.querySelector("#syncStatus"),
+      mailerUrl: document.querySelector("#mailerUrl"),
       toast: document.querySelector("#toast")
     };
 
@@ -952,13 +1048,18 @@
     function renderStats() {
       const month = dateKey().slice(0, 7);
       const records = Object.values(state.attendance).filter((item) => item.dateKey?.startsWith(month));
+      const todayRecords = Object.values(state.attendance).filter((item) => item.dateKey === dateKey());
       const present = records.filter((item) => item.status === "present").length;
       const absent = records.filter((item) => item.status === "absent").length;
       const total = records.length;
+      const todayPresent = todayRecords.filter((item) => item.status === "present").length;
       els.presentCount.textContent = present;
       els.absentCount.textContent = absent;
       els.markedCount.textContent = total;
       els.rateCount.textContent = total ? `${Math.round((present / total) * 100)}%` : "0%";
+      els.todayMarked.textContent = `${todayRecords.length}/${tasks.length * residents.length}`;
+      els.todayPresent.textContent = todayPresent;
+      els.liveSyncChip.textContent = state.firebaseReady ? "Live" : "Wait";
 
       const fixedTotal = fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
       els.monthlyTotal.textContent = money(fixedTotal);
@@ -1040,6 +1141,7 @@
 
     function renderSetup() {
       els.syncStatus.textContent = state.firebaseReady ? "Connected" : state.firebaseError || "Connecting...";
+      els.mailerUrl.value = state.mailer.url || "";
     }
 
     function renderExpenseForm() {
@@ -1164,6 +1266,82 @@
       }
     }
 
+    function mailerRequest(action, payload = {}) {
+      return new Promise((resolve, reject) => {
+        if (!state.mailer.url) {
+          reject(new Error("Add the Email Apps Script URL in Setup first."));
+          return;
+        }
+
+        const callback = `fwMail_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const url = new URL(state.mailer.url);
+        url.searchParams.set("callback", callback);
+        url.searchParams.set("action", action);
+        Object.entries(payload).forEach(([key, value]) => url.searchParams.set(key, value ?? ""));
+
+        const script = document.createElement("script");
+        const timer = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("Email request timed out."));
+        }, 15000);
+
+        function cleanup() {
+          window.clearTimeout(timer);
+          delete window[callback];
+          script.remove();
+        }
+
+        window[callback] = (response) => {
+          cleanup();
+          response?.ok ? resolve(response) : reject(new Error(response?.message || "Email request failed."));
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Could not reach Email Apps Script."));
+        };
+
+        script.src = url.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    function saveMailerSetup() {
+      state.mailer = { url: els.mailerUrl.value.trim() };
+      saveLocal("fw-mailer", state.mailer);
+      showToast("Email setup saved.");
+    }
+
+    async function sendAttendanceReminder() {
+      try {
+        await mailerRequest("attendanceReminder", {
+          appUrl: location.origin + location.pathname,
+          date: prettyDate()
+        });
+        showToast("Attendance reminder email sent.");
+      } catch (error) {
+        showToast(error.message);
+      }
+    }
+
+    async function sendSplitReminder() {
+      const fixedTotal = fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
+      const variableTotal = state.expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const total = fixedTotal + variableTotal;
+      try {
+        await mailerRequest("splitReminder", {
+          appUrl: location.origin + location.pathname,
+          total: money(total),
+          perHead: money(total / residents.length),
+          fixedTotal: money(fixedTotal),
+          addedExpenses: money(variableTotal)
+        });
+        showToast("Split reminder email sent.");
+      } catch (error) {
+        showToast(error.message);
+      }
+    }
+
     function switchView(view) {
       state.activeView = view;
       document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === view));
@@ -1238,6 +1416,9 @@
     document.querySelector("#refreshExpenses").addEventListener("click", () => syncData(true));
     document.querySelector("#addExpense").addEventListener("click", addExpense);
     document.querySelector("#syncNow").addEventListener("click", () => syncData(true));
+    document.querySelector("#saveMailer").addEventListener("click", saveMailerSetup);
+    document.querySelector("#sendAttendanceMail").addEventListener("click", sendAttendanceReminder);
+    document.querySelector("#sendSplitMail").addEventListener("click", sendSplitReminder);
 
     window.selectResident = selectResident;
     window.markAttendance = markAttendance;
