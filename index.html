@@ -862,7 +862,8 @@
       activeView: "attendance",
       firebaseReady: false,
       firebaseError: "",
-      db: null
+      db: null,
+      autoMarkHandled: false
     };
 
     const els = {
@@ -981,6 +982,36 @@
 
     function taskAvailable(task) {
       return !task.cleaningOnly || ["Sunday", "Wednesday"].includes(currentDayName());
+    }
+
+    function applyUrlResident() {
+      const params = new URLSearchParams(window.location.search);
+      const residentId = params.get("resident");
+      if (residentId && residents.some((resident) => resident.id === residentId)) {
+        state.selectedResident = residentId;
+        localStorage.setItem("fw-selected-resident", residentId);
+      }
+    }
+
+    async function handleAutoMarkFromUrl() {
+      if (state.autoMarkHandled || !state.firebaseReady) return;
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("autoMark") !== "1") return;
+
+      const residentId = params.get("resident");
+      const taskId = params.get("task");
+      const status = params.get("status");
+      const validResident = residents.some((resident) => resident.id === residentId);
+      const validTask = tasks.some((task) => task.id === taskId);
+      const validStatus = ["present", "absent"].includes(status);
+      if (!validResident || !validTask || !validStatus) return;
+
+      state.autoMarkHandled = true;
+      state.selectedResident = residentId;
+      localStorage.setItem("fw-selected-resident", residentId);
+      renderAll();
+      await markAttendance(taskId, status);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     function attendanceId(taskId, residentId, key = dateKey()) {
@@ -1363,6 +1394,7 @@
           state.firebaseError = "";
           saveLocal("fw-attendance", state.attendance);
           renderAll();
+          handleAutoMarkFromUrl();
         }, (error) => {
           state.firebaseReady = false;
           state.firebaseError = "Firestore error";
@@ -1423,6 +1455,7 @@
     window.selectResident = selectResident;
     window.markAttendance = markAttendance;
 
+    applyUrlResident();
     renderAll();
     startFirebase();
     updateClock();
