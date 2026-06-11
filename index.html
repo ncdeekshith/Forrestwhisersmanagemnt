@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forrest Whipsers Tracker</title>
+  <style>
+    :root {
+      --ink: #17211d;
+      --muted: #69746f;
+      --line: #dce4df;
+      --paper: #f6f8f2;
+      --card: #ffffff;
+      --green: #2f6d52;
+      --green-2: #dfeee6;
+      --blue: #426b88;
+      --blue-2: #e4eff5;
+      --clay: #b86642;
+      --clay-2: #fae8dd;
+      --gold: #d8a936;
+      --gold-2: #fbf0c8;
+      --red: #b7413c;
+      --shadow: 0 18px 42px rgba(24, 36, 30, .11);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(140deg, rgba(228, 239, 245, .9), rgba(246, 248, 242, .72) 42%, rgba(251, 240, 200, .72)),
+        var(--paper);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 44px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      padding: 18px 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .clock-card {
+      min-width: 260px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .mini-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .clock {
+      margin-top: 6px;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .date {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: flex;
+      gap: 8px;
+      padding: 10px 0;
+      background: rgba(246, 248, 242, .86);
+      backdrop-filter: blur(14px);
+    }
+
+    .tab {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .82);
+      font-weight: 900;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side,
+    .card,
+    .table-box,
+    .form-box {
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .side {
+      position: sticky;
+      top: 70px;
+      display: grid;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .resident-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .resident {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      color: var(--ink);
+      background: #f7f9f5;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .resident.active {
+      border-color: var(--green);
+      background: var(--green-2);
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      font-weight: 900;
+    }
+
+    .resident:nth-child(2) .avatar { background: var(--clay); }
+    .resident:nth-child(3) .avatar { background: var(--blue); }
+
+    .resident strong,
+    .resident span { display: block; }
+
+    .resident span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      min-height: 78px;
+      padding: 12px;
+      background: #f7f9f5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    details summary {
+      color: var(--green);
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .notice {
+      margin: 10px 0;
+      padding: 10px;
+      color: #644e12;
+      background: #fff7dd;
+      border: 1px solid #ebd782;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 11px 12px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-weight: 650;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .main {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel-view {
+      display: none;
+      gap: 18px;
+    }
+
+    .panel-view.active {
+      display: grid;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      min-height: 268px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--blue-2);
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .card:nth-child(2) .icon { background: var(--clay-2); color: var(--clay); }
+    .card:nth-child(3) .icon { background: var(--gold-2); color: #72540d; }
+
+    .card h2,
+    .form-box h2,
+    .table-head h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badge,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge {
+      color: var(--green);
+      background: var(--green-2);
+    }
+
+    .badge.locked {
+      color: #6d4e0d;
+      background: var(--gold-2);
+    }
+
+    .result {
+      min-height: 78px;
+      padding: 12px;
+      background: #f7f9f5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      line-height: 1.4;
+    }
+
+    .result strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .result span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-weight: 900;
+    }
+
+    .btn.primary { color: #fff; background: var(--green); }
+    .btn.soft { color: var(--green); background: var(--green-2); border: 1px solid #c8dfd2; }
+    .btn.danger { color: #fff; background: var(--red); }
+    .btn.clay { color: #fff; background: var(--clay); }
+    .btn.grow { flex: 1 1 140px; }
+
+    .expense-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .money-card {
+      min-height: 116px;
+      padding: 14px;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .money-card strong {
+      display: block;
+      margin: 7px 0 3px;
+      font-size: 25px;
+    }
+
+    .money-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .form-box {
+      padding: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .form-grid .wide { grid-column: span 2; }
+
+    .table-box {
+      overflow: hidden;
+    }
+
+    .table-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f7f9f5;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    .pill.ok { color: #fff; background: var(--green); }
+    .pill.no { color: #fff; background: var(--red); }
+    .pill.money { color: #60470b; background: var(--gold-2); }
+
+    .empty {
+      padding: 20px 16px;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 20;
+      width: min(540px, calc(100% - 24px));
+      padding: 13px 15px;
+      color: #fff;
+      background: var(--ink);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(18px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .clock-card,
+      .side {
+        position: static;
+        width: 100%;
+      }
+
+      .cards,
+      .expense-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        width: min(100% - 20px, 1180px);
+        padding-top: 8px;
+      }
+
+      h1 { font-size: 38px; }
+
+      .nav {
+        overflow-x: auto;
+        padding-bottom: 12px;
+      }
+
+      .tab { flex: 0 0 auto; }
+
+      .stats,
+      .cards,
+      .expense-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid .wide { grid-column: auto; }
+
+      .resident-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .table-box {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 680px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <section>
+        <p class="eyebrow">A 3BHK villa home board</p>
+        <h1>Forrest Whipsers Tracker</h1>
+        <p>Track Ratnamma's attendance, shared home expenses, and monthly splits for Deekshith, Varun, and Rexa.</p>
+      </section>
+      <section class="clock-card" aria-live="polite">
+        <div class="mini-label">Live date and time</div>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="date" id="dateLabel">Loading date</div>
+      </section>
+    </header>
+
+    <nav class="nav" aria-label="Tracker sections">
+      <button class="tab active" type="button" data-view="attendance">Attendance</button>
+      <button class="tab" type="button" data-view="expenses">Expenses</button>
+      <button class="tab" type="button" data-view="setup">Setup</button>
+    </nav>
+
+    <section class="layout">
+      <aside class="side">
+        <section>
+          <h2 class="section-title">Marking as</h2>
+          <div class="resident-grid" id="residentGrid"></div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Attendance month</h2>
+          <div class="stats">
+            <div class="stat"><strong id="presentCount">0</strong><span>Present</span></div>
+            <div class="stat"><strong id="absentCount">0</strong><span>Absent</span></div>
+            <div class="stat"><strong id="markedCount">0</strong><span>Marked</span></div>
+            <div class="stat"><strong id="rateCount">0%</strong><span>Rate</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Monthly split</h2>
+          <div class="stats">
+            <div class="stat"><strong id="monthlyTotal">₹0</strong><span>Fixed total</span></div>
+            <div class="stat"><strong id="perHead">₹0</strong><span>Each guy</span></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="main">
+        <section class="panel-view active" id="attendanceView">
+          <div class="cards" id="taskCards"></div>
+          <section class="table-box">
+            <div class="table-head">
+              <h2>Attendance history</h2>
+              <button class="btn soft" type="button" id="refreshAttendance">Refresh</button>
+            </div>
+            <div id="attendanceHistory"></div>
+          </section>
+        </section>
+
+        <section class="panel-view" id="expensesView">
+          <div class="expense-grid" id="fixedExpenseCards"></div>
+          <section class="form-box">
+            <h2>Add expense</h2>
+            <div class="form-grid">
+              <label>
+                Paid by
+                <select id="expensePayer"></select>
+              </label>
+              <label>
+                Category
+                <select id="expenseCategory">
+                  <option>Groceries</option>
+                  <option>Rent</option>
+                  <option>Cooking salary</option>
+                  <option>Cleaning salary</option>
+                  <option>Utilities</option>
+                  <option>Other</option>
+                </select>
+              </label>
+              <label>
+                Amount
+                <input id="expenseAmount" inputmode="decimal" placeholder="7000">
+              </label>
+              <label>
+                Date
+                <input id="expenseDate" type="date">
+              </label>
+              <label class="wide">
+                Note
+                <input id="expenseNote" placeholder="Monthly groceries, milk, vegetables...">
+              </label>
+              <div class="actions">
+                <button class="btn primary" type="button" id="addExpense">Save expense</button>
+              </div>
+            </div>
+          </section>
+          <section class="table-box">
+            <div class="table-head">
+              <h2>Expense history</h2>
+              <button class="btn soft" type="button" id="refreshExpenses">Refresh</button>
+            </div>
+            <div id="expenseHistory"></div>
+          </section>
+        </section>
+
+        <section class="panel-view" id="setupView">
+          <section class="form-box">
+            <h2>Google Sheets setup</h2>
+            <p class="notice">
+              Host this file on GitHub Pages. For live storage, create a Google Apps Script web app using the included <strong>google-apps-script.gs</strong> file, then paste the deployed Web App URL below.
+            </p>
+            <div class="form-grid">
+              <label class="wide">
+                Google Apps Script Web App URL
+                <input id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+              </label>
+              <label>
+                Reminder email 1
+                <input id="email1" placeholder="deekshith@example.com">
+              </label>
+              <label>
+                Reminder email 2
+                <input id="email2" placeholder="varun@example.com">
+              </label>
+              <label>
+                Reminder email 3
+                <input id="email3" placeholder="rexa@example.com">
+              </label>
+              <div class="actions">
+                <button class="btn primary" type="button" id="saveSetup">Save setup</button>
+                <button class="btn soft" type="button" id="syncNow">Sync now</button>
+              </div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const residents = [
+      { id: "deekshith", name: "Deekshith" },
+      { id: "varun", name: "Varun" },
+      { id: "rexa", name: "Rexa" }
+    ];
+
+    const tasks = [
+      { id: "morning-cooking", title: "Morning Cooking", schedule: "Every morning", icon: "AM" },
+      { id: "evening-cooking", title: "Evening Cooking", schedule: "Every evening", icon: "PM" },
+      { id: "cleaning", title: "Cleaning", schedule: "Sunday and Wednesday", icon: "CL", cleaningOnly: true }
+    ];
+
+    const fixedExpenses = [
+      { id: "rent", title: "Rent", amount: 32000, note: "A 3BHK villa rent" },
+      { id: "cooking", title: "Cooking salary", amount: 7000, note: "Ratnamma cooking" },
+      { id: "cleaning", title: "Cleaning salary", amount: 3000, note: "Ratnamma cleaning" },
+      { id: "groceries", title: "Groceries", amount: 7000, note: "Monthly home groceries" }
+    ];
+
+    const state = {
+      selectedResident: localStorage.getItem("fw-selected-resident") || "deekshith",
+      attendance: loadLocal("fw-attendance", {}),
+      expenses: loadLocal("fw-expenses", []),
+      config: loadLocal("fw-sheet-config", {}),
+      activeView: "attendance"
+    };
+
+    const els = {
+      clock: document.querySelector("#clock"),
+      dateLabel: document.querySelector("#dateLabel"),
+      residentGrid: document.querySelector("#residentGrid"),
+      taskCards: document.querySelector("#taskCards"),
+      attendanceHistory: document.querySelector("#attendanceHistory"),
+      fixedExpenseCards: document.querySelector("#fixedExpenseCards"),
+      expenseHistory: document.querySelector("#expenseHistory"),
+      presentCount: document.querySelector("#presentCount"),
+      absentCount: document.querySelector("#absentCount"),
+      markedCount: document.querySelector("#markedCount"),
+      rateCount: document.querySelector("#rateCount"),
+      monthlyTotal: document.querySelector("#monthlyTotal"),
+      perHead: document.querySelector("#perHead"),
+      expensePayer: document.querySelector("#expensePayer"),
+      expenseCategory: document.querySelector("#expenseCategory"),
+      expenseAmount: document.querySelector("#expenseAmount"),
+      expenseDate: document.querySelector("#expenseDate"),
+      expenseNote: document.querySelector("#expenseNote"),
+      scriptUrl: document.querySelector("#scriptUrl"),
+      email1: document.querySelector("#email1"),
+      email2: document.querySelector("#email2"),
+      email3: document.querySelector("#email3"),
+      toast: document.querySelector("#toast")
+    };
+
+    function loadLocal(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveLocal(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: value % 1 ? 2 : 0
+      }).format(value);
+    }
+
+    function dateKey(date = new Date()) {
+      return new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(date);
+    }
+
+    function prettyDate(date = new Date()) {
+      return new Intl.DateTimeFormat("en-IN", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        timeZoneName: "short"
+      }).format(date);
+    }
+
+    function prettyTime(value) {
+      const date = value ? new Date(value) : new Date();
+      return new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 3600);
+    }
+
+    function currentDayName() {
+      return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(new Date());
+    }
+
+    function taskAvailable(task) {
+      return !task.cleaningOnly || ["Sunday", "Wednesday"].includes(currentDayName());
+    }
+
+    function attendanceId(taskId, key = dateKey()) {
+      return `${key}_${taskId}`;
+    }
+
+    function renderResidents() {
+      els.residentGrid.innerHTML = residents.map((resident) => `
+        <button class="resident ${resident.id === state.selectedResident ? "active" : ""}" type="button" onclick="selectResident('${resident.id}')">
+          <span class="avatar">${resident.name[0]}</span>
+          <span>
+            <strong>${resident.name}</strong>
+            <span>${resident.id === state.selectedResident ? "Current marker" : "Tap to select"}</span>
+          </span>
+        </button>
+      `).join("");
+    }
+
+    function renderTasks() {
+      const today = dateKey();
+      els.taskCards.innerHTML = tasks.map((task) => {
+        const record = state.attendance[attendanceId(task.id, today)];
+        const available = taskAvailable(task);
+        const locked = Boolean(record);
+        const badgeText = !available ? "Not today" : locked ? "Locked" : "Open";
+        const result = locked
+          ? `<strong>${record.status === "present" ? "Present" : "Absent"}</strong><span>Marked by ${record.markedByName} at ${prettyTime(record.createdAt)}.</span>`
+          : `<strong>Waiting for attendance</strong><span>${available ? "Any one resident can mark this. After one mark, the duty is locked." : "Cleaning opens only on Sunday and Wednesday."}</span>`;
+
+        return `
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="icon">${task.icon}</div>
+                <h2>${task.title}</h2>
+                <p>${task.schedule}</p>
+              </div>
+              <span class="badge ${locked ? "locked" : ""}">${badgeText}</span>
+            </div>
+            <div class="result">${result}</div>
+            <div class="actions">
+              <button class="btn primary grow" type="button" onclick="markAttendance('${task.id}', 'present')" ${locked || !available ? "disabled" : ""}>Present</button>
+              <button class="btn danger grow" type="button" onclick="markAttendance('${task.id}', 'absent')" ${locked || !available ? "disabled" : ""}>Absent</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderStats() {
+      const month = dateKey().slice(0, 7);
+      const records = Object.values(state.attendance).filter((item) => item.dateKey?.startsWith(month));
+      const present = records.filter((item) => item.status === "present").length;
+      const absent = records.filter((item) => item.status === "absent").length;
+      const total = records.length;
+      els.presentCount.textContent = present;
+      els.absentCount.textContent = absent;
+      els.markedCount.textContent = total;
+      els.rateCount.textContent = total ? `${Math.round((present / total) * 100)}%` : "0%";
+
+      const fixedTotal = fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
+      els.monthlyTotal.textContent = money(fixedTotal);
+      els.perHead.textContent = money(fixedTotal / residents.length);
+    }
+
+    function renderAttendanceHistory() {
+      const rows = Object.values(state.attendance)
+        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+        .slice(0, 40);
+
+      if (!rows.length) {
+        els.attendanceHistory.innerHTML = `<div class="empty">No attendance has been marked yet.</div>`;
+        return;
+      }
+
+      els.attendanceHistory.innerHTML = `
+        <table>
+          <thead><tr><th>Date</th><th>Duty</th><th>Status</th><th>Marked by</th><th>Time</th></tr></thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${row.dateKey}</td>
+                <td>${row.taskTitle}</td>
+                <td><span class="pill ${row.status === "present" ? "ok" : "no"}">${row.status}</span></td>
+                <td>${row.markedByName}</td>
+                <td>${prettyTime(row.createdAt)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderFixedExpenses() {
+      const variableTotal = state.expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const fixedTotal = fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
+      const grandTotal = fixedTotal + variableTotal;
+      const cards = [
+        ...fixedExpenses,
+        { id: "variable", title: "Added expenses", amount: variableTotal, note: "Saved from expense form" },
+        { id: "each", title: "Each guy total", amount: grandTotal / residents.length, note: `Total ${money(grandTotal)} divided by 3` }
+      ];
+
+      els.fixedExpenseCards.innerHTML = cards.map((item) => `
+        <article class="money-card">
+          <div class="mini-label">${item.title}</div>
+          <strong>${money(item.amount)}</strong>
+          <span>${item.id === "each" ? item.note : `${money(item.amount / residents.length)} per guy. ${item.note}`}</span>
+        </article>
+      `).join("");
+    }
+
+    function renderExpenseHistory() {
+      const rows = [...state.expenses].sort((a, b) => String(b.createdAt || b.date).localeCompare(String(a.createdAt || a.date))).slice(0, 50);
+      if (!rows.length) {
+        els.expenseHistory.innerHTML = `<div class="empty">No extra expenses have been added yet.</div>`;
+        return;
+      }
+
+      els.expenseHistory.innerHTML = `
+        <table>
+          <thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Paid by</th><th>Split</th><th>Note</th></tr></thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${row.date}</td>
+                <td>${row.category}</td>
+                <td><span class="pill money">${money(Number(row.amount || 0))}</span></td>
+                <td>${row.paidByName}</td>
+                <td>${money(Number(row.amount || 0) / residents.length)} each</td>
+                <td>${row.note || "-"}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderSetup() {
+      els.scriptUrl.value = state.config.scriptUrl || "";
+      els.email1.value = state.config.email1 || "";
+      els.email2.value = state.config.email2 || "";
+      els.email3.value = state.config.email3 || "";
+    }
+
+    function renderExpenseForm() {
+      els.expensePayer.innerHTML = residents.map((resident) => `<option value="${resident.id}">${resident.name}</option>`).join("");
+      els.expensePayer.value = state.selectedResident;
+      if (!els.expenseDate.value) els.expenseDate.value = dateKey();
+    }
+
+    function renderAll() {
+      renderResidents();
+      renderTasks();
+      renderStats();
+      renderAttendanceHistory();
+      renderFixedExpenses();
+      renderExpenseHistory();
+      renderExpenseForm();
+      renderSetup();
+    }
+
+    function selectResident(residentId) {
+      state.selectedResident = residentId;
+      saveLocal("fw-selected-resident", residentId);
+      renderAll();
+    }
+
+    function jsonp(action, payload = {}) {
+      return new Promise((resolve, reject) => {
+        if (!state.config.scriptUrl) {
+          reject(new Error("missing-script-url"));
+          return;
+        }
+
+        const callback = `fwCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const url = new URL(state.config.scriptUrl);
+        url.searchParams.set("callback", callback);
+        url.searchParams.set("action", action);
+        Object.entries(payload).forEach(([key, value]) => url.searchParams.set(key, value ?? ""));
+
+        const script = document.createElement("script");
+        const timer = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("request-timeout"));
+        }, 12000);
+
+        function cleanup() {
+          window.clearTimeout(timer);
+          delete window[callback];
+          script.remove();
+        }
+
+        window[callback] = (response) => {
+          cleanup();
+          response?.ok ? resolve(response) : reject(new Error(response?.message || "request-failed"));
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("script-load-failed"));
+        };
+
+        script.src = url.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    async function syncData(showMessage = true) {
+      if (!state.config.scriptUrl) {
+        if (showMessage) showToast("Add the Google Apps Script URL in Setup to sync with Google Sheets.");
+        return;
+      }
+
+      try {
+        const response = await jsonp("list", {});
+        state.attendance = {};
+        (response.attendance || []).forEach((row) => {
+          state.attendance[row.id] = row;
+        });
+        state.expenses = response.expenses || [];
+        saveLocal("fw-attendance", state.attendance);
+        saveLocal("fw-expenses", state.expenses);
+        renderAll();
+        if (showMessage) showToast("Synced with Google Sheets.");
+      } catch (error) {
+        if (showMessage) showToast(`Sync failed: ${error.message}`);
+      }
+    }
+
+    async function markAttendance(taskId, status) {
+      const task = tasks.find((item) => item.id === taskId);
+      const resident = residents.find((item) => item.id === state.selectedResident);
+      if (!task || !resident) return;
+      if (!taskAvailable(task)) {
+        showToast("Cleaning attendance is only available on Sunday and Wednesday.");
+        return;
+      }
+
+      const id = attendanceId(task.id);
+      if (state.attendance[id]) {
+        showToast("Someone has already marked this attendance.");
+        return;
+      }
+
+      const payload = {
+        id,
+        dateKey: dateKey(),
+        taskId: task.id,
+        taskTitle: task.title,
+        status,
+        markedBy: resident.id,
+        markedByName: resident.name,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        if (state.config.scriptUrl) {
+          const response = await jsonp("markAttendance", payload);
+          state.attendance[response.record.id] = response.record;
+        } else {
+          state.attendance[id] = payload;
+        }
+        saveLocal("fw-attendance", state.attendance);
+        renderAll();
+        showToast(`${task.title} marked ${status} by ${resident.name}.`);
+      } catch (error) {
+        if (error.message === "already-marked") await syncData(false);
+        showToast(error.message === "already-marked" ? "Someone already marked this in Google Sheets." : `Could not save: ${error.message}`);
+      }
+    }
+
+    async function addExpense() {
+      const resident = residents.find((item) => item.id === els.expensePayer.value);
+      const amount = Number(String(els.expenseAmount.value).replace(/,/g, ""));
+      if (!resident || !amount || amount <= 0) {
+        showToast("Enter a valid expense amount.");
+        return;
+      }
+
+      const expense = {
+        id: `exp_${Date.now()}`,
+        date: els.expenseDate.value || dateKey(),
+        category: els.expenseCategory.value,
+        amount,
+        paidBy: resident.id,
+        paidByName: resident.name,
+        note: els.expenseNote.value.trim(),
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        if (state.config.scriptUrl) {
+          const response = await jsonp("addExpense", expense);
+          state.expenses.unshift(response.record);
+        } else {
+          state.expenses.unshift(expense);
+        }
+        saveLocal("fw-expenses", state.expenses);
+        els.expenseAmount.value = "";
+        els.expenseNote.value = "";
+        renderAll();
+        showToast("Expense saved.");
+      } catch (error) {
+        showToast(`Could not save expense: ${error.message}`);
+      }
+    }
+
+    function saveSetup() {
+      state.config = {
+        scriptUrl: els.scriptUrl.value.trim(),
+        email1: els.email1.value.trim(),
+        email2: els.email2.value.trim(),
+        email3: els.email3.value.trim()
+      };
+      saveLocal("fw-sheet-config", state.config);
+      showToast("Setup saved.");
+      if (state.config.scriptUrl) {
+        jsonp("saveEmails", {
+          email1: state.config.email1,
+          email2: state.config.email2,
+          email3: state.config.email3
+        }).catch(() => showToast("Setup saved locally. Email settings did not reach Google Sheets."));
+      }
+      syncData(false);
+    }
+
+    function switchView(view) {
+      state.activeView = view;
+      document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === view));
+      document.querySelectorAll(".panel-view").forEach((panel) => panel.classList.toggle("active", panel.id === `${view}View`));
+    }
+
+    function updateClock() {
+      const now = new Date();
+      els.clock.textContent = new Intl.DateTimeFormat("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }).format(now);
+      els.dateLabel.textContent = prettyDate(now);
+    }
+
+    document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => switchView(tab.dataset.view)));
+    document.querySelector("#refreshAttendance").addEventListener("click", () => syncData(true));
+    document.querySelector("#refreshExpenses").addEventListener("click", () => syncData(true));
+    document.querySelector("#addExpense").addEventListener("click", addExpense);
+    document.querySelector("#saveSetup").addEventListener("click", saveSetup);
+    document.querySelector("#syncNow").addEventListener("click", () => syncData(true));
+
+    window.selectResident = selectResident;
+    window.markAttendance = markAttendance;
+
+    renderAll();
+    updateClock();
+    window.setInterval(updateClock, 1000);
+    syncData(false);
+  </script>
+</body>
+</html>
