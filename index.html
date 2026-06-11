@@ -697,7 +697,7 @@
           <section class="form-box">
             <h2>Google Sheets setup</h2>
             <p class="notice">
-              Host this file on GitHub Pages. For live storage, create a Google Apps Script web app using the included <strong>google-apps-script.gs</strong> file, then paste the deployed Web App URL below.
+              Host this file on GitHub Pages. For live storage, create a Google Apps Script web app using the included <strong>google-apps-script.gs</strong> file, then paste the deployed Web App URL below. The tracker syncs with Google Sheets every 1 minute.
             </p>
             <div class="form-grid">
               <label class="wide">
@@ -846,8 +846,17 @@
       return !task.cleaningOnly || ["Sunday", "Wednesday"].includes(currentDayName());
     }
 
-    function attendanceId(taskId, key = dateKey()) {
-      return `${key}_${taskId}`;
+    function attendanceId(taskId, residentId, key = dateKey()) {
+      return `${key}_${taskId}_${residentId}`;
+    }
+
+    function attendanceForTask(taskId, key = dateKey()) {
+      return Object.values(state.attendance).filter((record) => record.dateKey === key && record.taskId === taskId);
+    }
+
+    function namesFor(records, status) {
+      const names = records.filter((record) => record.status === status).map((record) => record.markedByName);
+      return names.length ? names.join(", ") : "None";
     }
 
     function renderResidents() {
@@ -865,13 +874,19 @@
     function renderTasks() {
       const today = dateKey();
       els.taskCards.innerHTML = tasks.map((task) => {
-        const record = state.attendance[attendanceId(task.id, today)];
+        const records = attendanceForTask(task.id, today);
+        const residentRecord = records.find((record) => record.markedBy === state.selectedResident);
         const available = taskAvailable(task);
-        const locked = Boolean(record);
-        const badgeText = !available ? "Not today" : locked ? "Locked" : "Open";
-        const result = locked
-          ? `<strong>${record.status === "present" ? "Present" : "Absent"}</strong><span>Marked by ${record.markedByName} at ${prettyTime(record.createdAt)}.</span>`
-          : `<strong>Waiting for attendance</strong><span>${available ? "Any one resident can mark this. After one mark, the duty is locked." : "Cleaning opens only on Sunday and Wednesday."}</span>`;
+        const present = records.filter((record) => record.status === "present").length;
+        const absent = records.filter((record) => record.status === "absent").length;
+        const pending = Math.max(residents.length - records.length, 0);
+        const badgeText = !available ? "Not today" : `${records.length}/${residents.length} marked`;
+        const result = records.length
+          ? `<strong>${present} Present · ${absent} Absent · ${pending} Pending</strong><span>Present: ${namesFor(records, "present")}<br>Absent: ${namesFor(records, "absent")}</span>`
+          : `<strong>Waiting for attendance</strong><span>${available ? "Each resident can mark once. Everyone sees the shared count after sync." : "Cleaning opens only on Sunday and Wednesday."}</span>`;
+        const helperText = residentRecord
+          ? `<span>You marked ${residentRecord.status} at ${prettyTime(residentRecord.createdAt)}.</span>`
+          : "";
 
         return `
           <article class="card">
@@ -881,12 +896,12 @@
                 <h2>${task.title}</h2>
                 <p>${task.schedule}</p>
               </div>
-              <span class="badge ${locked ? "locked" : ""}">${badgeText}</span>
+              <span class="badge ${residentRecord ? "locked" : ""}">${badgeText}</span>
             </div>
-            <div class="result">${result}</div>
+            <div class="result">${result}${helperText}</div>
             <div class="actions">
-              <button class="btn primary grow" type="button" onclick="markAttendance('${task.id}', 'present')" ${locked || !available ? "disabled" : ""}>Present</button>
-              <button class="btn danger grow" type="button" onclick="markAttendance('${task.id}', 'absent')" ${locked || !available ? "disabled" : ""}>Absent</button>
+              <button class="btn primary grow" type="button" onclick="markAttendance('${task.id}', 'present')" ${residentRecord || !available ? "disabled" : ""}>Present</button>
+              <button class="btn danger grow" type="button" onclick="markAttendance('${task.id}', 'absent')" ${residentRecord || !available ? "disabled" : ""}>Absent</button>
             </div>
           </article>
         `;
@@ -1083,9 +1098,9 @@
         return;
       }
 
-      const id = attendanceId(task.id);
+      const id = attendanceId(task.id, resident.id);
       if (state.attendance[id]) {
-        showToast("Someone has already marked this attendance.");
+        showToast(`${resident.name} has already marked this duty today.`);
         return;
       }
 
@@ -1109,10 +1124,10 @@
         }
         saveLocal("fw-attendance", state.attendance);
         renderAll();
-        showToast(`${task.title} marked ${status} by ${resident.name}.`);
+        showToast(`${task.title} marked ${status} by ${resident.name}. Sync runs every minute.`);
       } catch (error) {
         if (error.message === "already-marked") await syncData(false);
-        showToast(error.message === "already-marked" ? "Someone already marked this in Google Sheets." : `Could not save: ${error.message}`);
+        showToast(error.message === "already-marked" ? `${resident.name} already marked this in Google Sheets.` : `Could not save: ${error.message}`);
       }
     }
 
@@ -1200,6 +1215,7 @@
     renderAll();
     updateClock();
     window.setInterval(updateClock, 1000);
+    window.setInterval(() => syncData(false), 60000);
     syncData(false);
   </script>
 </body>
