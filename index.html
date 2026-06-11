@@ -831,6 +831,7 @@
 
     function dateKey(date = new Date()) {
       return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
         year: "numeric",
         month: "2-digit",
         day: "2-digit"
@@ -839,6 +840,7 @@
 
     function prettyDate(date = new Date()) {
       return new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
         weekday: "long",
         day: "2-digit",
         month: "long",
@@ -878,7 +880,7 @@
     }
 
     function currentDayName() {
-      return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(new Date());
+      return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "Asia/Kolkata" }).format(new Date());
     }
 
     function taskAvailable(task) {
@@ -1215,13 +1217,20 @@
     }
 
     function updateClock() {
-      const now = new Date();
-      els.clock.textContent = new Intl.DateTimeFormat("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      }).format(now);
-      els.dateLabel.textContent = prettyDate(now);
+      try {
+        const now = new Date();
+        els.clock.textContent = new Intl.DateTimeFormat("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }).format(now);
+        els.dateLabel.textContent = prettyDate(now);
+      } catch (error) {
+        const fallback = new Date();
+        els.clock.textContent = fallback.toLocaleTimeString();
+        els.dateLabel.textContent = fallback.toDateString();
+      }
     }
 
     document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => switchView(tab.dataset.view)));
@@ -1234,9 +1243,9 @@
     window.markAttendance = markAttendance;
 
     renderAll();
+    startFirebase();
     updateClock();
     window.setInterval(updateClock, 1000);
-    startFirebase();
   </script>
 </body>
 </html>
